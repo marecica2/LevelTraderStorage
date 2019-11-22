@@ -8,7 +8,7 @@ using cAlgo.API.Internals;
 
 namespace cAlgo
 {
-    [Robot(TimeZone = TimeZones.UTC, AccessRights = AccessRights.FileSystem)]
+    [Robot(TimeZone = TimeZones.UTC, AccessRights = AccessRights.FullAccess)]
     public class LevelTraderStorage : Robot
     {
         private static WebClient client = new WebClient();
@@ -43,6 +43,7 @@ namespace cAlgo
             {
                 DirectoryInfo source = new DirectoryInfo(Source);
                 DirectoryInfo destination = new DirectoryInfo(GetDestinationFolder());
+                FetchCalendar();
                 if (!destination.Exists)
                 {
                     destination = Directory.CreateDirectory(GetDestinationFolder());
@@ -73,13 +74,12 @@ namespace cAlgo
 
         private void FetchCalendar()
         {
-
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(URL);
             request.Method = "GET";
             String body = String.Empty;
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
-                var fileStream = File.Create(GetDestinationFolder() + "\\calendar-"+Server.Time.Year+"-"+GetWeekOfYear(Server.Time)+".xml");
+                var fileStream = File.Create(Destination + "\\calendar-"+Server.Time.Year+"-"+GetWeekOfYear(Server.Time)+".xml");
                 Stream dataStream = response.GetResponseStream();
                 dataStream.CopyTo(fileStream);
                 dataStream.Close();
