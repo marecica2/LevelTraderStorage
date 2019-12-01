@@ -30,8 +30,14 @@ namespace cAlgo
 
         protected override void OnStart()
         {
-            DailyReloadHour = int.Parse(DailyReloadTimeInput.Split(new string[] { ":" }, StringSplitOptions.None)[0]);
-            DailyReloadMinute = int.Parse(DailyReloadTimeInput.Split(new string[] { ":" }, StringSplitOptions.None)[1]);
+            DailyReloadHour = int.Parse(DailyReloadTimeInput.Split(new string[] 
+            {
+                ":"
+            }, StringSplitOptions.None)[0]);
+            DailyReloadMinute = int.Parse(DailyReloadTimeInput.Split(new string[] 
+            {
+                ":"
+            }, StringSplitOptions.None)[1]);
             Timer.Start(60);
         }
 
@@ -39,7 +45,7 @@ namespace cAlgo
         {
             base.OnTimer();
             DateTime time = Server.TimeInUtc;
-            if (DailyReloadHour == time.Hour && DailyReloadMinute == time.Minute)
+            if (DailyReloadHour == time.Hour && DailyReloadMinute == time.Minute && ( time.DayOfWeek != DayOfWeek.Saturday || time.DayOfWeek != DayOfWeek.Sunday))
             {
                 DirectoryInfo source = new DirectoryInfo(Source);
                 DirectoryInfo destination = new DirectoryInfo(GetDestinationFolder());
@@ -49,7 +55,8 @@ namespace cAlgo
                     destination = Directory.CreateDirectory(GetDestinationFolder());
                     CopyFilesRecursively(source, destination);
                     Print("Copy levels to backup folder finished. Source: {0} Destination: {1}", source, GetDestinationFolder());
-                } else
+                }
+                else
                 {
                     Print("Skipping backup. Folder already exists. Source: {0} Destination: {1}", source, GetDestinationFolder());
                 }
@@ -79,7 +86,7 @@ namespace cAlgo
             String body = String.Empty;
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
-                var fileStream = File.Create(Destination + "\\calendar-"+Server.Time.Year+"-"+GetWeekOfYear(Server.Time)+".xml");
+                var fileStream = File.Create(Destination + "\\calendar-" + Server.Time.Year + "-" + GetWeekOfYear(Server.Time) + ".xml");
                 Stream dataStream = response.GetResponseStream();
                 dataStream.CopyTo(fileStream);
                 dataStream.Close();
